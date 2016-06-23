@@ -1,0 +1,90 @@
+%%reading in the images
+clear all;
+close all;
+
+a=dir('*.jpg');
+for(i=1: length(a))
+    names{i}=a(i).name;
+    if(size(imread(names{i}),3)==3) %%check for greyscale
+        im{i}=rgb2gray(imread(names{i}));
+    else
+        im{i}=imread(names{i});
+    end
+    imvecs{i} = double(reshape(im{i},numel(im{i}),1));
+end
+
+rndlist1=randperm(length(imvecs));
+rndlist2=randperm(length(imvecs));
+for(i=1:length(a))
+imvecsrnd{i}=imvecs{rndlist1(i)};
+e
+%%randomize list and assign target values
+for(j=1:length(a))
+    if(j<=(length(a)/2))
+        target(j)=1;
+    else
+        target(j)=0;
+    end
+end
+
+
+
+% w(:,1)=zeros(size(imvecs{1},1),1);
+w(:,1)=randint(1024,1,-255,255);
+e=1;
+exit=0;
+errcnt(e)=0;
+while(exit~=1)
+    for(i=1:length(a))
+        analogresponse=dot(w(:,e),imvecs{rndlist(i)});
+        out=hardlim(analogresponse);
+        analogplot(i,e)=analogresponse; %%record for plotting
+        err=target(i)-out;
+%         err=target(rndlist(i))-out;
+        w(:,e)=w(:,e)+err*imvecs{rndlist(i)};
+        if(err==1 || err==-1)
+            errcnt(e)=errcnt(e) + 1;
+        end
+    end
+
+    if(e>5) %check exit conditions
+        avglast3=(errcnt(e)+errcnt(e-1)+errcnt(e-2))/3;
+%         if(errcnt(e)>errcnt(e-4))
+            if(errcnt(e)==0)
+            exit=1;
+        end
+    end
+    if(exit~=1)
+        w(:,e+1)=w(:,e);
+        errcnt(e+1)=0;
+        e=e+1;
+    end
+end
+
+%%plotting training errors vs epoch
+% epochindex=[1:e];
+% figure, plot(epochindex,errcnt,'bo');
+% title('errors over time');
+% xlabel('epoch');
+% ylabel('number of errors');
+
+
+%%plotting the analog response
+% errorindex=[1:length(imvecs)];
+% for (e=1: length(errcnt))
+%     figure, stem(errorindex,analogplot(:,e))
+%     title(['epoch ', num2str(e)])
+%     xlabel('picture number')
+%     ylabel('analog response')
+% end
+
+errorindex=[1:length(imvecs)];
+laste=length(errcnt);
+    figure, stem(errorindex,analogplot(:,laste))
+    title(['epoch ', num2str(laste)])
+    xlabel('picture number')
+    ylabel('analog response')
+
+% % plot the weight vector
+% wshow=reshape(w(:,4),32,32);
+% figure, imagesc(wshow);

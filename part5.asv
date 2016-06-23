@@ -1,0 +1,9 @@
+for j=1:5
+    for i=300:310
+        errcounter(j,i)=projt(i);
+    end
+    sumerrors
+end
+
+for k=1:5
+avgerrors(
